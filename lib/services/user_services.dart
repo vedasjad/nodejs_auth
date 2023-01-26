@@ -28,13 +28,15 @@ class UserService {
       if (res.statusCode != 201) {
         debugPrint(res.statusCode.toString());
       }
-      List<City> citiesClassList = [];
 
-      citiesClassList = res.body as List<City>;
+      final citiesClassList = json.decode(res.body) as Map<String, dynamic>;
 
-      for (City city in citiesClassList) {
-        cityList.add(city.city);
-      }
+      // citiesClassList = res.body as List<City>;
+
+      // for (City city in citiesClassList) {
+      //   debugPrint(city.city);
+      //   cityList.add(city.city);
+      // }
     } catch (e) {
       showSnackBar(context, e.toString());
     }

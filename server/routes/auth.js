@@ -13,7 +13,7 @@ const auth = require("../middleware/auth");
  authRouter.post("/api/getCities",async(req,res)=>{
      try{
         const city =  await City.find();
-        res.status(200).json(city);
+        res.status(200).json({cityList: city});
      }catch(e){
         res.status(500).json({error:e.message});
      }

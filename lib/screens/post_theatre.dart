@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
-import '../custom_textfield.dart';
-import '../services/auth_services.dart';
+import 'package:node_auth/services/admin_services.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+import '../custom_textfield.dart';
+
+class PostMovies extends StatefulWidget {
+  const PostMovies({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<PostMovies> createState() => _PostMoviesState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final AuthService authService = AuthService();
+class _PostMoviesState extends State<PostMovies> {
+  final TextEditingController theatreNameController = TextEditingController();
+  final TextEditingController cityController = TextEditingController();
+  final AdminService adminService = AdminService();
 
-  void loginUser() {
-    authService.signInUser(
+  void postTheatre() {
+    adminService.postTheatre(
       context: context,
-      email: emailController.text,
-      password: passwordController.text,
+      theatreName: theatreNameController.text,
+      city: cityController.text,
     );
   }
 
@@ -29,28 +30,28 @@ class _LoginScreenState extends State<LoginScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
-            "Login",
+            "Add Theatre",
             style: TextStyle(fontSize: 30),
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.08),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             child: CustomTextField(
-              controller: emailController,
-              hintText: 'Enter your email',
+              controller: theatreNameController,
+              hintText: 'Enter Theatre Name',
             ),
           ),
           const SizedBox(height: 20),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             child: CustomTextField(
-              controller: passwordController,
-              hintText: 'Enter your password',
+              controller: cityController,
+              hintText: 'Enter City',
             ),
           ),
           const SizedBox(height: 40),
           ElevatedButton(
-            onPressed: loginUser,
+            onPressed: postTheatre,
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(Colors.blue),
               textStyle: MaterialStateProperty.all(
@@ -61,8 +62,11 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             child: const Text(
-              "Login",
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              "Add Theatre",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
             ),
           ),
         ],

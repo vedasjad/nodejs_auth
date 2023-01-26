@@ -3,7 +3,6 @@ import 'package:node_auth/models/user.dart';
 
 class UserProvider extends ChangeNotifier {
   User _user = User(
-    id: '',
     name: '',
     email: '',
     token: '',

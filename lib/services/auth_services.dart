@@ -8,7 +8,6 @@ import 'package:node_auth/utils/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../utils/constants.dart';
 
 class AuthService {
@@ -19,36 +18,29 @@ class AuthService {
     required String name,
   }) async {
     try {
-      debugPrint(email.toString());
       User user = User(
-        id: '',
         name: name,
         email: email,
         token: '',
         password: password,
       );
-
+      // debugPrint(user.toJson());
       http.Response res = await http.post(
-        Uri.parse('${Constants.uri}/api/signup'),
+        Uri.parse('${Constants.uri}/auth/register'),
         body: user.toJson(),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
-
-      httpErrorHandle(
-        response: res,
-        context: context,
-        onSuccess: () {
-          showSnackBar(
-            context,
-            'Account created! Login with the same credentials!',
-          );
-        },
+      if (res.statusCode != 201) {
+        debugPrint(res.statusCode.toString());
+      }
+      showSnackBar(
+        context,
+        'Account created! Login with the same credentials!',
       );
     } catch (e) {
       showSnackBar(context, e.toString());
-      debugPrint(e.toString());
     }
   }
 
@@ -61,7 +53,7 @@ class AuthService {
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       final navigator = Navigator.of(context);
       http.Response res = await http.post(
-        Uri.parse('${Constants.uri}/api/signin'),
+        Uri.parse('${Constants.uri}/auth/login'),
         body: jsonEncode({
           'email': email,
           'password': password,
@@ -71,19 +63,32 @@ class AuthService {
         },
       );
 
-      httpErrorHandle(
-        response: res,
-        context: context,
-        onSuccess: () async {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          userProvider.setUser(res.body);
-          await prefs.setString('x-auth-token', jsonDecode(res.body)['token']);
-          navigator.pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (route) => false,
-          );
-        },
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      debugPrint(res.body);
+      userProvider.setUser(res.body);
+
+      await prefs.setString('auth-token', jsonDecode(res.body)['accessToken']);
+      debugPrint(prefs.getString('auth-token'));
+
+      navigator.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false,
       );
+
+      // httpErrorHandle(
+      //   response: res,
+      //   context: context,
+      //   onSuccess: () async {
+      //     SharedPreferences prefs = await SharedPreferences.getInstance();
+      //     userProvider.setUser(res.body);
+      //     await prefs.setString(
+      //         'auth-token', jsonDecode(res.body)['accessToken'].toString());
+      //     navigator.pushAndRemoveUntil(
+      //       MaterialPageRoute(builder: (context) => const HomeScreen()),
+      //       (route) => false,
+      //     );
+      //   },
+      // );
     } catch (e) {
       showSnackBar(context, e.toString());
     }
@@ -95,31 +100,39 @@ class AuthService {
     try {
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('x-auth-token');
+      String? token = prefs.getString('auth-token');
+      // debugPrint(token);
+      // debugPrint("checkpoint 1");
 
       if (token == null) {
-        prefs.setString('x-auth-token', '');
+        prefs.setString('auth-token', '');
       }
-      var tokenRes = await http.post(
-        Uri.parse('${Constants.uri}/tokenIsValid'),
+      var tokenRes = await http.get(
+        Uri.parse('${Constants.uri}/auth/verifytoken'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'x-auth-token': token!,
+          'auth-token': token!,
         },
       );
+      // debugPrint(tokenRes.body);
+      // debugPrint("checkpoint 2");
 
       var response = jsonDecode(tokenRes.body);
 
       if (response == true) {
         http.Response userRes = await http.get(
-          Uri.parse('${Constants.uri}/'),
+          Uri.parse('${Constants.uri}/users/'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
-            'x-auth-token': token,
+            'auth-token': token,
           },
         );
-
+        // var resp = jsonDecode(userRes.body);
+        // debugPrint(userRes.headers['auth-token']);
+        // userProvider.user.token = userRes.headers['auth-token']!;
+        // debugPrint("checkpoint 3");
         userProvider.setUser(userRes.body);
+        debugPrint(userRes.body);
       }
     } catch (e) {
       showSnackBar(context, e.toString());
@@ -129,7 +142,7 @@ class AuthService {
   void signOut(BuildContext context) async {
     final navigator = Navigator.of(context);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('x-auth-token', '');
+    prefs.setString('auth-token', '');
     navigator.pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (context) => const SignUpScreen(),

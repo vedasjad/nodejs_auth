@@ -1,9 +1,142 @@
 const express = require("express");
 const bcryptjs = require("bcryptjs");
 const User = require("../models/user");
+const Theatre = require("../models/theatre");
+const City = require("../models/city");
+const Show = require("../models/show");
+const Audi = require("../models/audi");
 const authRouter = express.Router();
 const jwt = require('jsonwebtoken');
 const auth = require("../middleware/auth");
+
+//fetchCities
+// authRouter.get("api/getCities",async(res)=>{
+//     try{
+//         res.json({...city});
+//     }catch(e){
+//         res.status(500).json({error:e.message});
+//     }
+// });
+
+// authRouter.get("api/:city/getTheatres",async(req,res)=>{
+//     try{
+//         const{city} = await req.params.city;
+
+//         const theatresAvailable = await Theatre.find
+
+//     }catch(e){
+//         res.status(500).json({error:e.message});
+//     }
+// });
+
+//add theatre by admin
+authRouter.post("/api/addTheatre", async(req,res)=>{
+    try{
+        const{theatreName,theatreId,city} = req.body;
+
+        const existingTheatreId = await Theatre.findOne({theatreId});
+        if(existingTheatreId){
+            return res.status(400).json({msg: "Theatre with same name and city already exists!"});
+        }
+
+        let theatre = new Theatre({
+            theatreId,
+            theatreName,
+            city,
+        });
+
+        theatre = await theatre.save();
+        const existingCity = await City.findOne({city});
+        if(existingCity==null){
+            let newCity = new City({
+                city,
+            });
+            newCity = await newCity.save();
+        }
+        res.json(theatre);
+
+    }catch(e){
+        res.status(500).json({error:e.message});
+    }
+});
+
+//add audis
+authRouter.post("/api/addAudi",async(req,res) => {
+    try{
+        const{audiId,numberOfRows,numberOfColumns,typesOfSeats,seats} = req.body;
+
+        const existingAudi = await Audi.findOne({audiId});
+
+        if(existingAudi){
+            return res.status(400).json({msg: "Audi Already Exists!"});
+        }
+
+        let audi = new Audi({
+            audiId,
+            numberOfColumns,
+            numberOfRows,
+            typesOfSeats,
+            seats,
+        });
+
+        audi = await audi.save();
+        res.json(audi);
+
+    }catch(e){
+        res.status(500).json({error:e.message});
+    }
+});
+
+//add shows
+authRouter.post("/api/addShow",async(req,res)=>{
+    try{
+        const{showId,theatreId,movieId,date,time,audi,prices,bookedSeats} = req.body;
+
+        const existingShow = await Show.findOne({showId});
+        
+        if(existingShow){
+            return res.status(400).json({msg: "Show In same audi for same movie at same time already exists!"});
+        }
+
+        let show = new Show({
+            showId,
+            theatreId,
+            movieId,
+            date,
+            time,
+            audi,
+            bookedSeats,
+            // typesOfPrices,
+            prices,
+        });
+
+        show  = await show.save();
+        res.json(show);
+
+    }catch(e){
+        res.status(500).json({error:e.message});
+
+    }
+});
+
+//bookSeat
+// authRouter.post("/api/bookSeats",async(req,res)=>{
+//     try{
+//         const{showId,bookedSeats} = req.body;
+
+//         const isSeatBooked = await Show.showId.findOne({bookedSeats});
+
+//         if(isSeatBooked){
+//             return res.status(400).json({msg: "Show In same audi for same movie at same time already exists!"}); 
+//         }
+
+//         //update booked seats in the showId
+//     }catch(e){
+//         res.status(500).json({error:e.message});
+
+//     }
+// })
+
 //Sign Up
 authRouter.post("/api/signup",async(req,res)=>{
     try{

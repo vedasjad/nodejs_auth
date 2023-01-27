@@ -17,8 +17,11 @@ class _ChooseCityState extends State<ChooseCity> {
     userService.getCities(context: context);
   }
 
+  // setState(() {
+  // });
   @override
   Widget build(BuildContext context) {
+    getMovies;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -26,7 +29,9 @@ class _ChooseCityState extends State<ChooseCity> {
             children: [
               cityList.isEmpty
                   ? ElevatedButton(
-                      onPressed: getMovies,
+                      onPressed: () {
+                        getMovies();
+                      },
                       child: const Text("Get Cities"),
                     )
                   : SizedBox(

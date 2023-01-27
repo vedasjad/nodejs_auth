@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/city.dart';
+import '../models/city_list.dart';
 
 class CityProvider extends ChangeNotifier {
   City _city = City(
@@ -8,7 +9,7 @@ class CityProvider extends ChangeNotifier {
 
   City get city => _city;
 
-  void setCity(String city) {
+  void setCity(Map<String, dynamic> city) {
     _city = City.fromJson(city);
     notifyListeners();
   }

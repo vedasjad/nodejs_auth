@@ -30,13 +30,12 @@ class UserService {
       }
 
       final citiesClassList = json.decode(res.body) as Map<String, dynamic>;
+      final listCities = CityList.fromJson(citiesClassList);
 
-      // citiesClassList = res.body as List<City>;
-
-      // for (City city in citiesClassList) {
-      //   debugPrint(city.city);
-      //   cityList.add(city.city);
-      // }
+      for (City city in listCities.listOfCities) {
+        debugPrint(city.city);
+        cityList.add(city.city);
+      }
     } catch (e) {
       showSnackBar(context, e.toString());
     }

@@ -12,13 +12,14 @@ class City {
     };
   }
 
-  factory City.fromMap(Map<String, dynamic> map) {
+  factory City.fromJson(Map<String, dynamic> json) {
     return City(
-      city: map['city'] ?? '',
+      city: json['city'] as String ?? '',
     );
   }
 
-  String toJson() => json.encode(toMap());
+  @override
+  String toString() => city;
 
-  factory City.fromJson(String source) => City.fromJson(json.decode(source));
+  // factory City.fromJson(Map<String,dynamic> source) => City.fromJson(json.decode(source));
 }

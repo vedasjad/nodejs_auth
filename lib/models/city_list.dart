@@ -11,12 +11,12 @@ class CityList {
     required this.listOfCities,
   });
 
-  // factory CityList.fromJson(List<City>json){
-  //   final citiesFromJson = json[''] as List;
-  //   return CityList(
-  //     listOfCities: [
-  //       ...citiesFromJson.cast()
-  //     ]
-  //   );
-  // }
+  factory CityList.fromJson(Map<String, dynamic> json) {
+    final citiesFromJson = json['cityList'] as List;
+    return CityList(listOfCities: [
+      ...citiesFromJson
+          .cast<Map<String, dynamic>>()
+          .map((i) => City.fromJson(i)),
+    ]);
+  }
 }

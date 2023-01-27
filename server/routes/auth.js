@@ -43,7 +43,8 @@ const auth = require("../middleware/auth");
 //add theatre by admin
 authRouter.post("/api/addTheatre", async(req,res)=>{
     try{
-        const{theatreName,theatreId,city} = req.body;
+        const{theatreName,city} = req.body;
+        var theatreId = (theatreName+city).trim();
 
         const existingTheatreId = await Theatre.findOne({theatreId});
         if(existingTheatreId){
